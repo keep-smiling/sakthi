@@ -87,7 +87,7 @@ def calc_predicted_expectation(feature_function, train_data, feature_functions,d
 def calc_prob_labels_given_words(labels, feature_functions, train_data,denominator):
     nominator = 1
     for j in range(1, len(labels)):
-        nominator *= math.exp(sum(
+        nominator += math.log(sum(
             [feature_function.apply_match(labels[j - 1]) * feature_function.get_weight() for feature_function in feature_functions]))
     '''
     denominator = 1
@@ -105,14 +105,15 @@ def denominator(feature_functions, train_data):
     denominator = 1
     for words, labels in train_data:
          for j in range(1, len(labels)):
-             denominator *= math.exp(sum(
+             denominator += math.log(sum(
                 [feature_function.apply_match(labels[j - 1]) * feature_function.get_weight() for
                  feature_function in feature_functions]))
+         #print (denominator)
     return denominator    
     
 
 def train(train_data, all_labels, features_functions):
-    learning_rate = 0.01
+    learning_rate = 1/len(features_functions)
     iterations = 1
     weights = initial_weights(len(features_functions))
     # updates weights and count for each label paris
@@ -120,9 +121,13 @@ def train(train_data, all_labels, features_functions):
         v = calc_empirical_expectation(feature_function, train_data)
         feature_function.update(v,weight)
     # print each label pairs
-    print("\n\nInitial Term pair weights\n")   
+    print("\n\nInitial Term pair weights\n")
+    m =0
     for feature_function in feature_functions:
         feature_function.print_value()
+        m+=1
+        if m>20:
+            break
     print(len(feature_functions))
     print(len(train_data))
     '''
@@ -135,7 +140,8 @@ def train(train_data, all_labels, features_functions):
     print(value)
     calc = calc_prob_labels_given_words(value,train_data)
     '''  
-    
+    denominator1 = denominator(feature_functions, train_data)
+    print(denominator1)
     for _ in range(iterations):
         denominator1 = denominator(feature_functions, train_data)
         i = 1
@@ -150,21 +156,28 @@ def train(train_data, all_labels, features_functions):
             predicted_expectation = calc_predicted_expectation(feature_function, train_data,features_functions,denominator1)
             new_weight = feature_function.get_weight() + learning_rate * (empirical_expectation - predicted_expectation)
             feature_function.put_weight(new_weight)
-            #print("small variation in lemda : %f " % (-learning_rate * (empirical_expectation - predicted_expectation)) )
-            #print("new weight  : %f" % (new_weight))
-            #print(empirical_expectation,predicted_expectation)
+            print("small variation in lemda : %f " % (learning_rate * (empirical_expectation - predicted_expectation)) )
+            print("new weight  : %f" % (new_weight))
+            print(empirical_expectation,predicted_expectation)
             
             #print(empirical_expectation,predicted_expectation)
             #print(feature_function.get_weight())
             i += 1
+            if i>20:
+                break
+            
     
-       
+    m =0
     print("\n\nAfter iteration Term pair weights\n")        
     for feature_function in feature_functions:
-        feature_function.print_value()  
+        feature_function.print_value() 
+        m+=1
+        if m>20:
+            break
+    '''
     for feature_function in feature_functions:
         feature_function.print_value_file()  
-    
+    '''
 if __name__ == '__main__':
 
     train_data = load_train_data()
