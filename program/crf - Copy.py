@@ -11,7 +11,7 @@ def load_train_data():
 
 def load_data():
     data_list = []
-    filepath = 'preprocessed_sarcastic.txt' 
+    filepath = 'preprocessed_nonsarcastic.txt' 
     with open(filepath) as fp:  
         txt = fp.readline()
         while txt:   
@@ -122,12 +122,10 @@ def train(train_data, all_labels, features_functions):
         feature_function.update(v,weight)
     # print each label pairs
     print("\n\nInitial Term pair weights\n")
-    m =0
+    
     for feature_function in feature_functions:
         feature_function.print_value()
-        m+=1
-        if m>20:
-            break
+       
     print(len(feature_functions))
     print(len(train_data))
     '''
@@ -163,21 +161,19 @@ def train(train_data, all_labels, features_functions):
             #print(empirical_expectation,predicted_expectation)
             #print(feature_function.get_weight())
             i += 1
-            if i>20:
-                break
+            
             
     
-    m =0
+ 
     print("\n\nAfter iteration Term pair weights\n")        
     for feature_function in feature_functions:
         feature_function.print_value() 
-        m+=1
-        if m>20:
-            break
-    '''
+       
+
     for feature_function in feature_functions:
-        feature_function.print_value_file()  
-    '''
+        feature_function.print_value_file()
+        
+    
 if __name__ == '__main__':
 
     train_data = load_train_data()

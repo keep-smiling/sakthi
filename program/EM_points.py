@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Dec 30 10:18:08 2018
+
+@author: Girinathaprasad
+"""
+
 import numpy as np
 import pandas as pd
 import random as rand
@@ -53,12 +60,29 @@ if __name__ == '__main__':
             x1.append(val)
             y1.append(cummulation(line))
             line = fp.readline()
-    v = len(x1)
-    labels = ([1] * v) 
-    data = {'x': x1, 'y': y1, 'label': labels}
+    x2 = []
+    y2 = []
+    filepath = 'preprocessed_nonsarcastic3.txt'
+    with open(filepath) as fp:  
+        line = fp.readline()
+        while line:
+            ss = sid.polarity_scores(line)
+            val= abs(ss['neg']-ss['pos'])
+            x2.append(val)
+            y2.append(cummulation(line))
+            line = fp.readline()   
+            
+    v1 = len(x1)
+    v2 = len(x2)
+    xs = np.concatenate((x1, x2))
+    ys = np.concatenate((y1, y2))
+    labels = ([1] * v1) + ([2] * v2)
+    data = {'x': xs, 'y': ys, 'label': labels}
     df = pd.DataFrame(data=data)
     print(df)
+    print(v1)
+    print(v2)
     fig = plt.figure()
     plt.scatter(data['x'], data['y'], 5, c=data['label'])
     fig.set_size_inches(20,20)
-    fig.savefig("true-values.png")
+    fig.savefig("true-values1.png")
